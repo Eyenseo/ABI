@@ -25,38 +25,48 @@
  * and import symbols of dynamic libraries.
  *
  * The normal solution is to create a header for each library, copy & paste the
- * contents of an existing library and then change the macros that are being
- * defined by search and replace.
+ * contents of an existing library header and then change the macros that are
+ * being defined by search and replace. If your project only has a few libraries
+ * this header will not proove to be of much convenience. (Lazzy people might
+ * want to disagree with that after the first copy without further modifications
+ * ;))
  *
- * This header is the only header that you'll need from now on because
+ * Usage:
  *
- *      void E_ABI(mylib) foo();
+ *      void E_ABI(my_lib) foo();
  *
- * will evaluate to different statements depending on definitions.
+ * Will evaluate to different statements depending on compile-time definitions.
  *
  * The default behaviour is to import symbols. To export `foo` you'll have to
- * pass `E_ABI_mylib` (eg. `gcc -DE_ABI_mylib ...`). If the library is build as
- * a static version you can pass `E_ABI_STATIC_mylib` since the linker will
+ * pass `E_ABI_my_lib` (eg. `gcc -DE_ABI_my_lib ...`). If the library is build as
+ * a static version you can pass `E_ABI_STATIC_my_lib` since the linker will
  * handle all symbols.
  *
- * |      import     |      export     |         static         |
- * |                 |  E_ABI_mylib    |  E_ABI_STATIC_mylib    |
- * |  E_ABI_mylib 0  |  E_ABI_mylib 1  |  E_ABI_STATIC_mylib 1  |
- * |  E_ABI_mylib 2  |  -------------  |  --------------------  |
- * |  E_ABI_mylib a  |  -------------  |  --------------------  |
- * |       ...       |  -------------  |  --------------------  |
+ * |      import      |      export      |         static          |
+ * |                  |  E_ABI_my_lib    |  E_ABI_STATIC_my_lib    |
+ * |  E_ABI_my_lib 0  |  E_ABI_my_lib 1  |  E_ABI_STATIC_my_lib 1  |
+ * |  E_ABI_my_lib 2  |  --------------  |  ---------------------  |
+ * |  E_ABI_my_lib a  |  --------------  |  ---------------------  |
+ * |       ...        |  --------------  |  ---------------------  |
  *
- * + __Import__ means either `__declspec(dllimport)` or
- *   `__attribute__((visibility("default")))` depending on the platform /
- *   compiler.
- * + __Export__ means either `__declspec(dllexport)` or
- *   `__attribute__((visibility("default")))` depending on the platform /
- *   compiler.
- * + __Static__ means that the macro will be evaluated to nothing -- the linker
+ * + Import means either `__declspec(dllimport)`,
+ *   `__attribute__((dllimport))` or `__attribute__((visibility("default")))`
+ *   depending on the platform / compiler.
+ * + Export means either `__declspec(dllexport)`,
+ *   `__attribute__((dllexport))` or `__attribute__((visibility("default")))`
+ *   depending on the platform / compiler.
+ * + Static means that the macro will be evaluated to nothing -- the linker
  *   will take care of everything.
  *
  * To gain benefits from exporting / importing with gcc / clang the compile
- * option `-fvisibility=hidden` has to be passed to the compiler.
+ * option `-fvisibility=hidden` has to be passed to the compiler. But if you
+ * didn't know that already you should head over to this page and read up on
+ * this subject. https://gcc.gnu.org/wiki/Visibility
+ *
+ *
+ * Credits:
+ * pfultz2 for his Cloak  library. http://pfultz2.com/blog/
+ *                                 https://github.com/pfultz2/Cloak
  */
 
 
