@@ -66,13 +66,21 @@
 /**
  * Check which compiler is used
  */
-#if defined(_MSC_VER)
+#if defined _WIN32 || defined __CYGWIN__
+#ifdef __GNUC__
 #define EYENSEO_ABI_COMPILER_MSVC 1
-#elif defined(__GNUC__)
-#define EYENSEO_ABI_COMPILER_GCC 1
-// Clang is compatible to gcc so we don't need a special case
 #else
-#error Unknown compiler, please implement shared library macros
+#define EYENSEO_ABI_COMPILER_GWIN 1
+#endif
+#elif defined __GNUC__
+// Clang is compatible to gcc so we don't need a special case
+#if __GNUC__ >= 4
+#define EYENSEO_ABI_COMPILER_GCC 1
+#else
+#define EYENSEO_ABI_COMPILER_VOID 1
+#endif
+#else
+#error E_ABI - Unknown compiler, please implement the macros
 #endif
 
 /**
@@ -126,6 +134,13 @@
    /* Else:      */ EYENSEO_ABI_IF_ELSE(EYENSEO_ABI_CAT(E_ABI_, s))( \
        /* If defined:   We export */ __declspec(dllexport),          \
        /* Else:         We import */ __declspec(dllimport)))
+#elif defined(EYENSEO_ABI_COMPILER_GWIN)
+#define E_ABI(s)                                                     \
+  EYENSEO_ABI_IF_ELSE(EYENSEO_ABI_CAT(E_ABI_STATIC_, s))             \
+  (/* If static: Static libraries will be handled by the linker */,  \
+   /* Else:      */ EYENSEO_ABI_IF_ELSE(EYENSEO_ABI_CAT(E_ABI_, s))( \
+       /* If defined:   We export */ __attribute__((dllexport)),     \
+       /* Else:         We import */ __attribute__((dllimport))))
 #elif defined(EYENSEO_ABI_COMPILER_GCC)
 #define E_ABI(s)                                                             \
   EYENSEO_ABI_IF_ELSE(EYENSEO_ABI_CAT(E_ABI_STATIC_, s))                     \
@@ -133,5 +148,7 @@
    /* Else:      */ EYENSEO_ABI_IF_ELSE(EYENSEO_ABI_CAT(E_ABI_, s))(         \
        /* If defined:   We export */ __attribute__((visibility("default"))), \
        /* Else:         We import */ __attribute__((visibility("default")))))
+#elif defined(EYENSEO_ABI_COMPILER_VOID)
+#define E_ABI(s)
 #endif
 #endif
