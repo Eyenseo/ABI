@@ -21,34 +21,42 @@
 #ifndef EYENSEO_ABI_H
 #define EYENSEO_ABI_H
 /**
- * The main macro defined by this header is `E_ABI(s)`
+ * The main macro defined by this header is `E_ABI(s)` and it is used to export
+ * and import symbols of dynamic libraries.
  *
- * The macro is a convenience macro to export or import symbols. The normal
- * solution is to create a header for each library, copy & paste the contents of
- * an existing library and then change the macros that are being defined by
- * search and replace.
+ * The normal solution is to create a header for each library, copy & paste the
+ * contents of an existing library and then change the macros that are being
+ * defined by search and replace.
  *
- * This header is the only header that you'll need from now on:
+ * This header is the only header that you'll need from now on because
  *
  *      void E_ABI(mylib) foo();
  *
- * will evaluate to different statements depending on defined macros.
+ * will evaluate to different statements depending on definitions.
  *
- *      |      import     |      export     |         static         |
- *      |                 |  E_ABI_mylib    |  E_ABI_STATIC_mylib    |
- *      |  E_ABI_mylib 0  |  E_ABI_mylib 1  |  E_ABI_STATIC_mylib 1  |
- *      |  E_ABI_mylib 2  |  -------------  |  --------------------  |
- *      |  E_ABI_mylib a  |  -------------  |  --------------------  |
- *      |       ...       |  -------------  |  --------------------  |
+ * The default behaviour is to import symbols. To export `foo` you'll have to
+ * pass `E_ABI_mylib` (eg. `gcc -DE_ABI_mylib ...`). If the library is build as
+ * a static version you can pass `E_ABI_STATIC_mylib` since the linker will
+ * handle all symbols.
  *
- * + Import means either `__declspec(dllimport)` or
+ * |      import     |      export     |         static         |
+ * |                 |  E_ABI_mylib    |  E_ABI_STATIC_mylib    |
+ * |  E_ABI_mylib 0  |  E_ABI_mylib 1  |  E_ABI_STATIC_mylib 1  |
+ * |  E_ABI_mylib 2  |  -------------  |  --------------------  |
+ * |  E_ABI_mylib a  |  -------------  |  --------------------  |
+ * |       ...       |  -------------  |  --------------------  |
+ *
+ * + __Import__ means either `__declspec(dllimport)` or
  *   `__attribute__((visibility("default")))` depending on the platform /
  *   compiler.
- * + Export means either `__declspec(dllexport)` or
+ * + __Export__ means either `__declspec(dllexport)` or
  *   `__attribute__((visibility("default")))` depending on the platform /
  *   compiler.
- * + Static means that the macro will be evaluated to nothing -- the linker will
- *   take care of everything.
+ * + __Static__ means that the macro will be evaluated to nothing -- the linker
+ *   will take care of everything.
+ *
+ * To gain benefits from exporting / importing with gcc / clang the compile
+ * option `-fvisibility=hidden` has to be passed to the compiler.
  */
 
 
