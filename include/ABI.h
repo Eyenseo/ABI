@@ -77,7 +77,7 @@
  * Check which compiler is used
  */
 #if defined _WIN32 || defined __CYGWIN__
-#ifdef __GNUC__
+#ifndef __GNUC__
 #define EYENSEO_ABI_COMPILER_MSVC 1
 #else
 #define EYENSEO_ABI_COMPILER_GWIN 1
